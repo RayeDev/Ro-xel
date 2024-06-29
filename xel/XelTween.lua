@@ -2,7 +2,7 @@ local XelTween = {}
 local TS = game:GetService("TweenService")
 
 function XelTween:Tween(object:any,value:any,duration:number,options:any)
-	local Sex,EaseShit,EaseDirShit
+	local Sex,EaseShit,EaseDirShit,rep,typee
 	if options.ease then
 		if options.ease:match('cube') then EaseShit=Enum.EasingStyle.Cubic
 		elseif options.ease:match('circ') then EaseShit=Enum.EasingStyle.Circular	
@@ -23,7 +23,9 @@ function XelTween:Tween(object:any,value:any,duration:number,options:any)
 		else EaseDirShit=Enum.EasingDirection.Out	
 		end
 	end
-	Sex = TS:Create(object,TweenInfo.new(duration,EaseShit,EaseDirShit),value)
+	if options.startDelay then rep = options.startDelay else rep = 0 end
+	if options.typee then if options.typee == "LOOPING" then typee = true else typee = false end end
+	Sex = TS:Create(object,TweenInfo.new(duration,EaseShit,EaseDirShit,0,typee,rep),value)
 	if options.onComplete then Sex.Completed:Connect(function() options.onComplete() end) end
 	Sex:Play()
 end
