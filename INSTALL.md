@@ -5,4 +5,4 @@ So you want to use Xel? but you don't know how everything works. Sadly, you have
 first, everything will be handled in [ReplicatedStorage](https://create.roblox.com/docs/reference/engine/classes/ReplicatedStorage), Make a folder called "xel", after that, follow the "xel" folder in github and there you go. (BTW: ALL SCRIPTS ARE MODULE SCRIPTS!!!)
 
 # HELP:
-read the Wiki first!!
+read the [Wiki](https://github.com/RayeDev/Xel/wiki) first!!
