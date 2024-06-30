@@ -7,6 +7,4 @@ Read the Wiki on how each Varible, Function, etc. Works!
 # Credits:
 RayeDev: Writting Everything
 
-[isocortex](https://devforum.roblox.com/t/splitting-a-string/615260/10): String Splitting Tutorial
-
 HaxeFlixel: [flixel.](https://github.com/HaxeFlixel/flixel)
