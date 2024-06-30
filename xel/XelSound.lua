@@ -1,12 +1,10 @@
 local XelSound = {}
 local sound
-function XelSound:MakeSound(name:string, soundID:number, volume:number, playbackSpeed:number, looped:boolean, parent:Instance)
+function XelSound:MakeSound(name:string, soundID:number, volume:number, parent:Instance)
 	sound = Instance.new("Sound")
 	sound.Name = name
 	sound.SoundId = "rbxassetid://"..soundID or 0
 	sound.Volume = volume or 1
-	sound.PlaybackSpeed = playbackSpeed or 1
-	sound.Looped = looped or false
 	sound.Parent = parent or script
 end
 function XelSound:PlaySound(name:string)
