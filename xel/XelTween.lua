@@ -1,32 +1,83 @@
-local XelTween = {}
-local TS = game:GetService("TweenService")
+local Ease = require(script.Parent.Ease)
 
-function XelTween:Tween(object:any,value:any,duration:number,options:any)
-	local Sex,EaseShit,EaseDirShit,rep
-	if options.ease then
-		if options.ease:match('cube') then EaseShit=Enum.EasingStyle.Cubic
-		elseif options.ease:match('circ') then EaseShit=Enum.EasingStyle.Circular	
-		elseif options.ease:match('sine') then EaseShit=Enum.EasingStyle.Sine
-		elseif options.ease:match('linear') then EaseShit=Enum.EasingStyle.Linear
-		elseif options.ease:match('back') then EaseShit=Enum.EasingStyle.Back
-		elseif options.ease:match('bounce') then EaseShit=Enum.EasingStyle.Bounce
-		elseif options.ease:match('elastic') then EaseShit=Enum.EasingStyle.Elastic
-		elseif options.ease:match('expo') then EaseShit=Enum.EasingStyle.Exponential
-		elseif options.ease:match('quart') then EaseShit=Enum.EasingStyle.Quart
-		elseif options.ease:match('quint') then EaseShit=Enum.EasingStyle.Quint
-		elseif options.ease:match('quad') then EaseShit=Enum.EasingStyle.Quad
-		else EaseShit=Enum.EasingStyle.Linear	
-		end
-		if options.ease:match('Out') then EaseDirShit=Enum.EasingDirection.Out
-		elseif options.ease:match('In') then EaseDirShit=Enum.EasingDirection.In	
-		elseif options.ease:match('InOut') then EaseDirShit=Enum.EasingDirection.InOut
-		else EaseDirShit=Enum.EasingDirection.Out	
+-- Tween v1.7 | Made by Goober :3
+local TweenManager = {
+	tweens = {}
+}
+
+local XelTween = {}
+XelTween.__index = XelTween
+
+function XelTween.new(target, duration, values, params)
+	local self = setmetatable({}, XelTween)
+	self.target = target
+	self.duration = duration
+	self.elapsed = 0
+	self.completed = false
+	self.ease = Ease.linear -- Default to linear easing
+	self.startDelay = params.startDelay or 0
+	self.onComplete = params.onComplete
+
+	-- Initialize initial and target values
+	self.startValues = {}
+	self.endValues = {}
+
+	for k, v in pairs(values) do
+		self.startValues[k] = target[k]
+		self.endValues[k] = v
+	end
+
+	-- Set easing function
+	self.ease = params.ease or Ease.linear
+
+	table.insert(TweenManager.tweens, self)
+	return self
+end
+
+function Tween.update(dt)
+	-- Create a temporary table for efficient iteration
+	local activeTweens = {}
+	for i, tween in ipairs(TweenManager.tweens) do
+		if not tween.completed then
+			table.insert(activeTweens, tween)
 		end
 	end
-	if options.startDelay then rep = options.startDelay else rep = 0 end
-	Sex = TS:Create(object,TweenInfo.new(duration,EaseShit,EaseDirShit,0,false,rep),value)
-	if options.onComplete then Sex.Completed:Connect(function() options.onComplete() end) end
-	Sex:Play()
+
+	for _, tween in ipairs(activeTweens) do
+		if tween.startDelay > 0 then
+			tween.startDelay = tween.startDelay - dt
+			if tween.startDelay > 0 then
+				continue
+			end
+			dt = math.abs(tween.startDelay)
+			tween.elapsed = tween.elapsed + dt
+			tween.startDelay = 0
+		else
+			tween.elapsed = tween.elapsed + dt
+		end
+
+		local progress = math.min(tween.elapsed / tween.duration, 1)
+		local easedProgress = tween.ease(progress)
+
+		for k, startValue in pairs(tween.startValues) do
+			local endValue = tween.endValues[k]
+			tween.target[k] = startValue + (endValue - startValue) * easedProgress
+		end
+
+		if progress >= 1 then
+			tween.completed = true
+			if tween.onComplete then
+				tween.onComplete()
+			end
+		end
+	end
+
+	-- Remove completed tweens from the main table
+	for i = #TweenManager.tweens, 1, -1 do
+		if TweenManager.tweens[i].completed then
+			table.remove(TweenManager.tweens, i)
+		end
+	end
 end
 
 return XelTween
