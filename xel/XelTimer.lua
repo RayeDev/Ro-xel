@@ -1,27 +1,34 @@
-local XelTimer = {}
-local nam = ""
-local timez = 0
-
-function XelTimer:MakeTimer(name:string,time:number)
-	nam = name
-	timez = time
+local XelTimer = {
+	duration = 1;
+	callback = nil;
+	loops = 1;
+	elapsed = 0;
+	running = false;
+	finished = false;
+}
+function XelTimer.new(duration, loops, callback)
+	XelTimer.duration = duration or 1
+	XelTimer.callback = callback or nil
+	XelTimer.loops = loops or 1
+	XelTimer:reset()
 end
-
-function XelTimer:StartTimer(name:string)
-	if name == nam then
-		repeat timez -= 1 task.wait(1) until timez == 0
-	else
-		error("Timer Doesn't exist, make a timer using XelTimer:MakeTimer()")
+function XelTimer:update(dt)
+	if not XelTimer.running then return end
+	XelTimer.elapsed += dt
+	if XelTimer.elapsed >= XelTimer.duration then
+		XelTimer.elapsed -= XelTimer.duration
+		if XelTimer.callback then XelTimer.callback() end
+		if XelTimer.loops > 1 then
+			XelTimer.loops -= 1
+		else
+			XelTimer.finished = true
+			XelTimer.running = false
+		end
 	end
 end
-
-
-function XelTimer:CallBack(name:string,callBack:any)
-	if name == nam and callBack then
-		callBack()
-	else
-		error("Timer Doesn't exist, make a timer using XelTimer:MakeTimer()")
-	end
-end
-
+function XelTimer:start() XelTimer.running = true XelTimer.finished = false end
+function XelTimer:stop() XelTimer.running = false end
+function XelTimer:reset() XelTimer.elapsed = 0 XelTimer.running = false XelTimer.finished = false end
+function XelTimer:isRunning() return XelTimer.running end
+function XelTimer:isFinished() return XelTimer.finished end
 return XelTimer
